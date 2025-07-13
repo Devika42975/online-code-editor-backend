@@ -1,15 +1,17 @@
 const axios = require("axios");
 
-const languageMap= {
+const languageMap = {
   python: 71,
   javascript: 63,
   cpp: 54,
   java: 62,
 };
+
 const JUDGE0_API = "https://judge0-ce.p.rapidapi.com";
+
 const headers = {
   "X-RapidAPI-Key": process.env.JUDGE0_API_KEY,
-"X-RapidAPI-Host": process.env.JUDGE0_API_HOST,
+  "X-RapidAPI-Host": process.env.JUDGE0_API_HOST,
   "content-type": "application/json",
 };
 
