@@ -8,7 +8,6 @@ const languageMap = {
 };
 
 const JUDGE0_API = "https://judge0-ce.p.rapidapi.com";
-
 const headers = {
   "X-RapidAPI-Key": process.env.JUDGE0_API_KEY,
   "X-RapidAPI-Host": process.env.JUDGE0_API_HOST,
