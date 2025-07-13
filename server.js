@@ -1,15 +1,16 @@
 require("dotenv").config(); 
-console.log("Loaded API KEY:", process.env.JUDGE0_API_KEY);
 const express = require("express");
 const cors = require("cors");
 const runRoute = require("./routes/run");
 
 const app = express();
-app.use(cors({ origin: "http://localhost:5173" }));
+
+app.use(cors({
+  origin: "https://online-code-editor-frontend-three.vercel.app", // ✅ your frontend domain
+}));
 app.use(express.json());
 
-// 👇 Updated route
-app.use("/execute", runRoute);
+app.use("/execute", runRoute); // ✅ main route
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

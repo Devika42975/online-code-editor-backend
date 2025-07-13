@@ -1,20 +1,16 @@
+require("dotenv").config(); 
 const express = require("express");
-const router = express.Router();
-const executeCode = require("../utils/executeCode");
+const cors = require("cors");
+const runRoute = require("./routes/run");
 
-router.post("/", async (req, res) => {
-  const { language, code } = req.body;
+const app = express();
 
-  if (!language || !code) {
-    return res.status(400).json({ error: "Missing language or code" });
-  }
+app.use(cors({
+  origin: "https://online-code-editor-frontend-three.vercel.app", // ✅ your frontend domain
+}));
+app.use(express.json());
 
-  try {
-    const output = await executeCode(language, code);
-    res.json({ output });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+app.use("/execute", runRoute); // ✅ main route
 
-module.exports = router;
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
