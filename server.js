@@ -6,7 +6,7 @@ const runRoute = require("./routes/run");
 const app = express();
 
 app.use(cors({
-  origin: "https://online-code-editor-frontend-three.vercel.app", // ✅ your frontend domain
+  origin: "https://online-code-editor-frontend-three.vercel.app/", // ✅ your frontend domain
 }));
 app.use(express.json());
 
