@@ -1,4 +1,5 @@
 const axios = require("axios");
+require("dotenv").config();
 
 const languageMap = {
   python: 71,
@@ -7,40 +8,52 @@ const languageMap = {
   java: 62,
 };
 
-const executeCode = async (language, code) => {
+const executeCode = async (language, code, input = "") => {
   const language_id = languageMap[language];
   if (!language_id) throw new Error("Unsupported language");
 
-  const headers = {
-    "Content-Type": "application/json",
-    "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-    "X-RapidAPI-Key": process.env.JUDGE0_API_KEY,
-  };
-
-  // Step 1: Submit the code
-  const submission = await axios.post(
+  // Submit code to Judge0
+  const submissionRes = await axios.post(
     "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=false",
-    { source_code: code, language_id },
-    { headers }
+    {
+      source_code: code,
+      language_id,
+      stdin: input, // ✅ This is the important part for input() to work
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "X-RapidAPI-Host": process.env.JUDGE0_API_HOST,
+        "X-RapidAPI-Key": process.env.JUDGE0_API_KEY,
+      },
+    }
   );
 
-  const token = submission.data.token;
+  const token = submissionRes.data.token;
 
-  // Step 2: Poll until complete
+  // Poll Judge0 for result
   let result;
-  while (true) {
+  let status = { id: 1 };
+  while (status.id <= 2) {
     const response = await axios.get(
       `https://judge0-ce.p.rapidapi.com/submissions/${token}?base64_encoded=false`,
-      { headers }
+      {
+        headers: {
+          "X-RapidAPI-Host": process.env.JUDGE0_API_HOST,
+          "X-RapidAPI-Key": process.env.JUDGE0_API_KEY,
+        },
+      }
     );
 
     result = response.data;
+    status = result.status;
 
-    if (result.status.id > 2) break;
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    if (status.id <= 2) {
+      await new Promise((res) => setTimeout(res, 1500));
+    }
   }
 
-  return result.stdout || result.stderr || result.compile_output || "⚠️ No output";
+  return result.stdout || result.stderr || result.compile_output || "No output returned.";
 };
 
 module.exports = executeCode;
