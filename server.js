@@ -1,16 +1,24 @@
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://online-code-editor-frontend-wenl-dhf9p8eqh.vercel.app"
-];
+const express = require("express");
+const cors = require("cors");
+const runRoute = require("./routes/run");
+require("dotenv").config();
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "OPTIONS"],
-  credentials: true
-}));
+const app = express(); // ✅ Make sure this is declared BEFORE app.use()
+
+// Enable CORS
+app.use(
+  cors({
+    origin: "*", // Or restrict to your frontend URL if needed
+  })
+);
+
+app.use(express.json());
+
+// Route for running code
+app.use("/run", runRoute);
+
+// Start the server
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

@@ -1,5 +1,4 @@
 const axios = require("axios");
-require("dotenv").config();
 
 const languageMap = {
   python: 71,
@@ -8,17 +7,16 @@ const languageMap = {
   java: 62,
 };
 
-const executeCode = async (language, code, input = "") => {
+const executeCode = async (language, code) => {
   const language_id = languageMap[language];
   if (!language_id) throw new Error("Unsupported language");
 
-  // Submit code to Judge0
+  // Send code only
   const submissionRes = await axios.post(
     "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=false",
     {
       source_code: code,
       language_id,
-      stdin: input, // ✅ This is the important part for input() to work
     },
     {
       headers: {
@@ -31,7 +29,6 @@ const executeCode = async (language, code, input = "") => {
 
   const token = submissionRes.data.token;
 
-  // Poll Judge0 for result
   let result;
   let status = { id: 1 };
   while (status.id <= 2) {
